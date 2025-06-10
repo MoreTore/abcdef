@@ -15,6 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+CPPFLAGS +=  -I/usr/src/linux-headers-4.9.103+/include/uapi \
+             -I/usr/src/linux-headers-4.9.103+/include/generated/uapi \
+             -I/usr/src/linux-headers-4.9.103+/arch/arm64/include/uapi \
+             -I/usr/src/linux-headers-4.9.103+/arch/arm64/include/generated \
+             -idirafter /usr/src/linux-headers-4.9.103+/include
 
 # Toolchain path
 CROSS ?= aarch64-linux-gnu-
@@ -47,7 +52,7 @@ EXEC = v4l2_decode
 cflags = -std=gnu11 -Wall -pthread $(shell $(PKG_CONFIG) --cflags wayland-client libffi libavformat libavcodec libavutil) $(CFLAGS)
 ldflags = -pthread $(LDFLAGS)
 cppflags = -Iprotocol -D_DEFAULT_SOURCE $(CPPFLAGS)
-ldlibs = -lm -Wl,-Bstatic $(shell $(PKG_CONFIG) --libs --static wayland-client libffi libavformat libavcodec libavutil) -Wl,-Bdynamic
+ldlibs = $(shell pkg-config --libs wayland-client libffi libavformat libavcodec libavutil libva vdpau x11 xv) -lm
 
 all: $(EXEC)
 
