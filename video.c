@@ -923,7 +923,7 @@ int video_flush(struct instance *i, uint32_t flags)
 
 	memzero(dec);
 	dec.flags = flags;
-	dec.cmd = V4L2_DEC_QCOM_CMD_FLUSH;
+	dec.cmd = V4L2_QCOM_CMD_FLUSH;
 	if (ioctl(vid->fd, VIDIOC_DECODER_CMD, &dec) < 0) {
 		err("failed to flush: %m");
 		return -1;
