@@ -15,7 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-CPPFLAGS +=  -I/usr/src/linux-headers-4.9.103+/include/uapi \
+CPPFLAGS +=  -I/$(PWD)/include \
+	     -I/usr/src/linux-headers-4.9.103+/include/uapi \
              -I/usr/src/linux-headers-4.9.103+/include/generated/uapi \
              -I/usr/src/linux-headers-4.9.103+/arch/arm64/include/uapi \
              -I/usr/src/linux-headers-4.9.103+/arch/arm64/include/generated \
