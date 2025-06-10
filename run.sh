@@ -1,1 +1,1 @@
-./v4l_decode fcamera.hevc
+./v4l2_decode fcamera.hevc
