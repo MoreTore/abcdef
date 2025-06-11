@@ -1,3 +1,3 @@
 sudo apt update
-sudp apt install wayland-protocols
+sudo apt install wayland-protocols
 make
