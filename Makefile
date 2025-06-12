@@ -16,12 +16,10 @@
 # limitations under the License.
 #
 CPPFLAGS +=  -I/$(PWD)/include \
-	     -I/usr/src/linux-headers-4.9.103+/include/uapi \
-             -I/usr/src/linux-headers-4.9.103+/include/generated/uapi \
-             -I/usr/src/linux-headers-4.9.103+/arch/arm64/include/uapi \
-             -I/usr/src/linux-headers-4.9.103+/arch/arm64/include/generated \
-             -idirafter /usr/src/linux-headers-4.9.103+/include
+             -I/usr/src/linux-headers-4.9.103/include/uapi \
+             -idirafter /usr/src/linux-headers-4.9.103/include
 
+CFLAGS += -g
 # Toolchain path
 CROSS ?= aarch64-linux-gnu-
 
@@ -46,7 +44,7 @@ GENERATED_SOURCES = \
   protocol/linux-dmabuf-unstable-v1-protocol.c \
   protocol/linux-dmabuf-unstable-v1-client-protocol.h
 
-SOURCES = main.c args.c video.c display.c $(filter %.c,$(GENERATED_SOURCES))
+SOURCES = main.c args.c video.c display.c hw_rot.c $(filter %.c,$(GENERATED_SOURCES))
 OBJECTS := $(SOURCES:.c=.o)
 EXEC = v4l2_decode
 

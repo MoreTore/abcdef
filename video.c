@@ -392,24 +392,17 @@ int video_set_control(struct instance *i)
 		}
 	}
 
-	control.id = V4L2_CID_MPEG_VIDC_VIDEO_CONTINUE_DATA_TRANSFER;
-	control.value = i->continue_data_transfer;
 
-	if (ioctl(i->video.fd, VIDIOC_S_CTRL, &control) < 0) {
-		err("failed to set data transfer mode: %m");
-		return -1;
-	}
-
-	control.id = V4L2_CID_MPEG_VIDC_SET_PERF_LEVEL;
-	control.value = V4L2_CID_MPEG_VIDC_PERF_LEVEL_TURBO;
+	control.id = V4L2_CID_MPEG_VIDC_VIDEO_OPERATING_RATE;
+	control.value = INT_MAX;
 
 	if (ioctl(i->video.fd, VIDIOC_S_CTRL, &control) < 0) {
 		err("failed to set perf level: %m");
 		return -1;
 	}
 
-	control.id = V4L2_CID_MPEG_VIDC_VIDEO_CONCEAL_COLOR;
-	control.value = 0x00ff;
+	control.id = V4L2_CID_MPEG_VIDC_VIDEO_CONCEAL_COLOR_8BIT;
+	control.value = 0x000000ff;
 
 	if (ioctl(i->video.fd, VIDIOC_S_CTRL, &control) < 0) {
 		err("failed to set conceal color: %m");
@@ -714,9 +707,9 @@ int video_queue_buf_out(struct instance *i, int n, int length,
 	buf.length = 1;
 	buf.m.planes = planes;
 
-	buf.m.planes[0].m.userptr = (unsigned long)vid->out_ion_addr;
+	buf.m.planes[0].m.userptr = (unsigned long)vid->out_buf_off[n]; // check this
 	buf.m.planes[0].reserved[0] = vid->out_ion_fd;
-	buf.m.planes[0].reserved[1] = vid->out_buf_off[n];
+	buf.m.planes[0].reserved[1] = 0;
 	buf.m.planes[0].length = vid->out_buf_size;
 	buf.m.planes[0].bytesused = length;
 	buf.m.planes[0].data_offset = 0;
@@ -736,6 +729,10 @@ int video_queue_buf_out(struct instance *i, int n, int length,
 	    buf.m.planes[0].bytesused,
 	    buf.timestamp.tv_sec, buf.timestamp.tv_usec,
 	    video_count_output_queued_bufs(vid), vid->out_buf_cnt);
+	
+	static int frame_cnt = 0;
+	info("put %d compressed frames into the output queue (Contains compressed frame)", frame_cnt);
+	frame_cnt++;
 
 	return 0;
 }
@@ -791,6 +788,9 @@ int video_queue_buf_cap(struct instance *i, int n)
 
 	dbg("%s: queued buffer %d, %d/%d queued", buf_type_to_string(buf.type),
 	    buf.index, video_count_capture_queued_bufs(vid), vid->cap_buf_cnt);
+		static int frame_cnt = 0;
+	info("put %d empty frames into the capture queue (Contains blank frames for writing)", frame_cnt);
+	frame_cnt++;
 
 	return 0;
 }
@@ -830,6 +830,7 @@ static int video_dequeue_buf(struct instance *i, struct v4l2_buffer *buf)
 
 int video_dequeue_output(struct instance *i, int *n)
 {
+
 	struct v4l2_buffer buf;
 	struct v4l2_plane planes[OUT_PLANES];
 	int ret;
@@ -845,6 +846,9 @@ int video_dequeue_output(struct instance *i, int *n)
 		return ret;
 
 	*n = buf.index;
+	static int frame_cnt = 0;
+	info("Dequeued %d output frames (Contains compressed frame)", frame_cnt);
+	frame_cnt++;
 
 	return 0;
 }
@@ -887,6 +891,10 @@ int video_dequeue_capture(struct instance *i, int *n, unsigned int *bytesused,
 
 	if (extradata)
 		*extradata = extradata_valid ? extradata_addr : NULL;
+
+	static int frame_cnt = 0;
+	info("Dequeued %d Capture frames (Contains the decompressed frame)", frame_cnt);
+	frame_cnt++;
 
 	return 0;
 }
@@ -1218,12 +1226,14 @@ int video_setup_output(struct instance *i, unsigned long codec,
 	pix->height = i->height;
 	pix->pixelformat = codec;
 
-	video_set_framerate(i, i->fps_n, i->fps_d);
+
 
 	if (ioctl(vid->fd, VIDIOC_S_FMT, &fmt) < 0) {
 		err("failed to set %s format: %m", buf_type_to_string(type));
 		return -1;
 	}
+
+	video_set_framerate(i, i->fps_n, i->fps_d);
 
 	dbg("%s: setup buffer size=%u (requested=%u)", buf_type_to_string(type),
 	    pix->plane_fmt[0].sizeimage, size);

@@ -39,6 +39,9 @@
 #include "common.h"
 #include "video.h"
 #include "display.h"
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/stat.h>
 
 #define DBG_TAG "  main"
 
@@ -111,7 +114,7 @@ restart_capture(struct instance *i)
 		return -1;
 
 	/* Setup capture queue with new parameters */
-	if (video_setup_capture(i, 4, i->width, i->height))
+	if (video_setup_capture(i, 14, i->width, i->height))
 		return -1;
 
 	/* Start streaming */
@@ -200,49 +203,55 @@ handle_video_event(struct instance *i)
 		unsigned int *ptr = (unsigned int *)event.u.data;
 		unsigned int height = ptr[0];
 		unsigned int width = ptr[1];
+		// ptr[0] = event_notify->height;
+		// ptr[1] = event_notify->width;
+		// ptr[2] = event_notify->bit_depth;
+		// ptr[3] = event_notify->pic_struct;
+		// ptr[4] = event_notify->colour_space;
+		// ptr[5] = event_notify->crop_data.top;
+		// ptr[6] = event_notify->crop_data.left;
+		// ptr[7] = event_notify->crop_data.height;
+		// ptr[8] = event_notify->crop_data.width;
+		// ptr[9] = msm_comm_get_v4l2_profile(
+		// 	inst->fmts[OUTPUT_PORT].fourcc,
+		// 	event_notify->profile);
+		// ptr[10] = msm_comm_get_v4l2_level( // returns -22
+		// 	inst->fmts[OUTPUT_PORT].fourcc, 
+		// 	event_notify->level); 
+		// ptr[11] = event_notify->max_dpb_count;
+		// ptr[12] = event_notify->max_ref_count;
+		// ptr[13] = event_notify->max_dec_buffering;
 
 		info("Port Reconfig received insufficient, new size %ux%u",
 		     width, height);
-
-		if (ptr[2] & V4L2_EVENT_BITDEPTH_FLAG) {
-			enum msm_vidc_pixel_depth depth = ptr[3];
+		
+		if (i->depth != ptr[2]){
+			i->depth = ptr[2];
 			info("  bit depth changed to %s",
-			     depth_to_string(depth));
-
-			switch (depth) {
-			case MSM_VIDC_BIT_DEPTH_10:
-				i->depth = 10;
-				break;
-			case MSM_VIDC_BIT_DEPTH_8:
-				i->depth = 8;
-				break;
-			default:
-				i->depth = 0;
-				break;
-			}
+			     depth_to_string(i->depth));
 		}
 
-		if (ptr[2] & V4L2_EVENT_PICSTRUCT_FLAG) {
-			unsigned int pic_struct = ptr[4];
-			info("  interlacing changed to %s",
-			     pic_struct_to_string(pic_struct));
+		unsigned int pic_struct = ptr[3];
+		info("  interlacing changed to %s",
+				pic_struct_to_string(pic_struct));
 
-			if (pic_struct == MSM_VIDC_PIC_STRUCT_MAYBE_INTERLACED)
-				i->interlaced = 1;
-			else
-				i->interlaced = 0;
+		if (pic_struct == MSM_VIDC_PIC_STRUCT_MAYBE_INTERLACED) {
+			info("Not interlacing for testing");
+			i->interlaced = 1; // no iterlacing for testing
+		} else {
+			i->interlaced = 0;
 		}
+		
 
-		if (ptr[2] & V4L2_EVENT_COLOUR_SPACE_FLAG) {
-			unsigned int cspace = ptr[5];
-			info("  colorspace changed to %s",
-			     colorspace_to_string(cspace));
-		}
+		unsigned int cspace = ptr[4];
+		info("  colorspace changed to %s",
+				colorspace_to_string(cspace));
+		
 
 		i->width = width;
 		i->height = height;
 		i->reconfigure_pending = 1;
-
+		info("See dmesg msm_vidc for more info");
 		/* flush capture queue, we will reconfigure it when flush
 		 * done event is received */
 		video_flush(i, V4L2_QCOM_CMD_FLUSH_CAPTURE);
@@ -373,7 +382,9 @@ parse_frame(struct instance *i, AVPacket *pkt)
 		if (ret < 0)
 			return ret;
 	}
-
+	// for (int i = 0; i < pkt->size && i < 16; ++i)
+    // 	print(2,"%02X ", pkt->data[i]);
+	// print(2,"\n");
 	return 0;
 }
 
@@ -394,7 +405,7 @@ send_eos(struct instance *i, int buf_index)
 
 	tv.tv_sec = 0;
 	tv.tv_usec = 0;
-
+	info("sending eos");
 	if (video_queue_buf_out(i, buf_index, 0,
 				V4L2_QCOM_BUF_FLAG_EOS |
 				V4L2_QCOM_BUF_TIMESTAMP_INVALID, tv) < 0)
@@ -652,8 +663,10 @@ send_pkt(struct instance *i, int buf_index, AVPacket *pkt)
 
 	if (video_queue_buf_out(i, buf_index, size, flags, tv) < 0)
 		return -1;
+	
 
 	pthread_mutex_lock(&i->lock);
+
 	ts_insert(vid, pts, dts, duration, start_time);
 	pthread_mutex_unlock(&i->lock);
 
@@ -844,23 +857,39 @@ handle_video_capture(struct instance *i)
 			ts_remove(min);
 		}
 
-		pthread_mutex_unlock(&i->lock);
+		if (bytesused > 0 && vid->cap_buf_addr[n]) {
+			unsigned char *data = (unsigned char *)vid->cap_buf_addr[n];
+			size_t to_print = bytesused < 16 ? bytesused : 16;
+			print(2,"First %zu bytes of decoded frame: ", to_print);
+			for (size_t k = 0; k < to_print; ++k)
+				print(2,"%02X ", data[k]);
+			print(2,"\n");
+			
+			size_t frame_size = bytesused;
 
-		if (i->window) {
-			struct fb *fb = get_fb(i, n);
-			if (!fb) {
-				err("could not get framebuffer for "
-				    "video buffer %d", n);
-				return -1;
+			// write the raw NV12_UBWC frame to disk
+			int outfd = open("frame0001.nv12",
+							O_CREAT|O_WRONLY|O_TRUNC,
+							S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
+			if (outfd < 0) {
+			perror("open");
+			} else {
+			if (write(outfd, data, frame_size) != frame_size)
+				perror("write");
+			close(outfd);
 			}
 
-			info("show buffer pts=%" PRIu64, pts);
 
-			fb_apply_extradata(fb, extradata);
-			window_show_buffer(i->window, fb,
-					   buffer_released, i);
-			busy = true;
+			// Convert UBWC to linear NV12 using SDE rotator  
+			unsigned char *linear_data = NULL;  
+			size_t linear_size = 0;  
+			
+			int ret = convert_ubwc_to_linear(data, bytesused,
+										i->width, i->height,    
+										&linear_data, &linear_size); 
 		}
+
+		pthread_mutex_unlock(&i->lock);
 
 		i->prerolled = 1;
 
@@ -1315,6 +1344,7 @@ int main(int argc, char **argv)
 	pthread_t parser_thread;
 	int ret;
 
+
 	ret = parse_args(&inst, argc, argv);
 	if (ret) {
 		print_usage(argv[0]);
@@ -1352,7 +1382,7 @@ int main(int argc, char **argv)
 	}
 
 	ret = video_setup_output(&inst, inst.fourcc,
-				 STREAM_BUUFER_SIZE, 6);
+				 STREAM_BUUFER_SIZE, 4);
 	if (ret)
 		goto err;
 
@@ -1401,4 +1431,3 @@ err:
 	cleanup(&inst);
 	return 1;
 }
-
