@@ -940,8 +940,8 @@ int video_flush(struct instance *i, uint32_t flags)
 	return 0;
 }
 
-static int
-alloc_ion_buffer(struct instance *i, size_t size, uint32_t flags)
+int
+alloc_ion_buffer(size_t size, uint32_t flags)
 {
 	struct ion_allocation_data ion_alloc = { 0 };
 	struct ion_fd_data ion_fd_data = { 0 };
@@ -961,6 +961,7 @@ alloc_ion_buffer(struct instance *i, size_t size, uint32_t flags)
 	ion_alloc.len = size;
 	ion_alloc.align = 4096;
 	ion_alloc.flags = flags;
+	ion_alloc.heap_id_mask = 0;
 
 	if (flags & ION_SECURE)
 		ion_alloc.heap_id_mask = ION_HEAP(ION_SECURE_HEAP_ID);
@@ -1004,7 +1005,7 @@ static int setup_extradata(struct instance *i, int index, int size)
 	vid->extradata_size = size;
 
 	if (vid->extradata_ion_fd < 0) {
-		vid->extradata_ion_fd = alloc_ion_buffer(i, size * MAX_CAP_BUF, 0);
+		vid->extradata_ion_fd = alloc_ion_buffer(size * MAX_CAP_BUF, 0);
 		vid->extradata_ion_addr = mmap(NULL,
 					       size * MAX_CAP_BUF,
 					       PROT_READ|PROT_WRITE,
@@ -1126,7 +1127,7 @@ int video_setup_capture(struct instance *i, int num_buffers, int w, int h)
 		ion_flags = 0;
 
 	for (n = 0; n < vid->cap_buf_cnt; n++) {
-		ion_fd = alloc_ion_buffer(i, vid->cap_buf_size, ion_flags);
+		ion_fd = alloc_ion_buffer(vid->cap_buf_size, ion_flags);
 		if (ion_fd < 0)
 			return -1;
 
@@ -1257,7 +1258,7 @@ int video_setup_output(struct instance *i, unsigned long codec,
 	    count, reqbuf.count);
 
 	ion_size = vid->out_buf_cnt * vid->out_buf_size;
-	ion_fd = alloc_ion_buffer(i, ion_size, 0);
+	ion_fd = alloc_ion_buffer(ion_size, 0);
 	if (ion_fd < 0)
 		return -1;
 

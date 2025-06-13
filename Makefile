@@ -44,7 +44,7 @@ GENERATED_SOURCES = \
   protocol/linux-dmabuf-unstable-v1-protocol.c \
   protocol/linux-dmabuf-unstable-v1-client-protocol.h
 
-SOURCES = main.c args.c video.c display.c hw_rot.c $(filter %.c,$(GENERATED_SOURCES))
+SOURCES = main.c args.c video.c display.c hw_rot.c rotator/rot_test.c $(filter %.c,$(GENERATED_SOURCES))
 OBJECTS := $(SOURCES:.c=.o)
 EXEC = v4l2_decode
 

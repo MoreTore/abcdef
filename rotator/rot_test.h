@@ -1,0 +1,1 @@
+int test_rot(int argc, char *argv[]);

@@ -26,9 +26,13 @@
 #include <stdint.h>
 #include <linux/videodev2.h>
 #include <media/msm_vidc.h>
+#include <stdbool.h>
 
 struct instance;
 struct fb;
+
+
+int alloc_ion_buffer(size_t size, uint32_t flags);
 
 /* Open the video decoder device */
 int video_open(struct instance *i, char *name);

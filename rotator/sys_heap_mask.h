@@ -1,0 +1,1 @@
+#define SYS_HEAP_MASK  (1u << ION_HEAP_TYPE_SYSTEM)

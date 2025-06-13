@@ -1,0 +1,94 @@
+comma@comma-260eef42:/data/v4l2-decode$ strace -Tfe trace=ioctl ./v4l2_decode fcamera.hevc
+ioctl(2, TCGETS, {c_iflag=BRKINT|ICRNL|IXON|IXANY|IMAXBEL|IUTF8, c_oflag=NL0|CR0|TAB0|BS0|VT0|FF0|OPOST|ONLCR, c_cflag=B38400|CS8|CREAD|HUPCL, c_lflag=ISIG|ICANON|ECHO|ECHOE|ECHOK|IEXTEN|ECHOCTL|ECHOKE, ...}) = 0 <0.000102>
+ioctl(2, TCGETS, {c_iflag=BRKINT|ICRNL|IXON|IXANY|IMAXBEL|IUTF8, c_oflag=NL0|CR0|TAB0|BS0|VT0|FF0|OPOST|ONLCR, c_cflag=B38400|CS8|CREAD|HUPCL, c_lflag=ISIG|ICANON|ECHO|ECHOE|ECHOK|IEXTEN|ECHOCTL|ECHOKE, ...}) = 0 <0.000105>
+[hevc @ 0x5572454360] Stream #0: not enough frames to estimate rate; consider increasing probesize
+Input #-1, hevc, from 'fcamera.hevc':
+  Duration: N/A, bitrate: N/A
+    Stream #-1:0: Video: hevc (Main), yuv420p(tv), 1928x1208, 20 fps, 20 tbr, 1200k tbn, 20 tbc
+ioctl(4, VIDIOC_QUERYCAP, {driver="msm_vidc_driver", card="msm_vdec_8974", bus_info="", version=KERNEL_VERSION(0, 0, 1), capabilities=V4L2_CAP_VIDEO_CAPTURE_MPLANE|V4L2_CAP_VIDEO_OUTPUT_MPLANE|V4L2_CAP_EXT_PIX_FORMAT|V4L2_CAP_STREAMING|V4L2_CAP_DEVICE_CAPS, device_caps=V4L2_CAP_VIDEO_CAPTURE_MPLANE|V4L2_CAP_VIDEO_OUTPUT_MPLANE|V4L2_CAP_EXT_PIX_FORMAT|V4L2_CAP_STREAMING}) = 0 <0.000716>
+ioctl(4, VIDIOC_ENUM_FMT, {index=0, type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE, flags=V4L2_FMT_FLAG_COMPRESSED, description="MPEG-4 part 2 ES", pixelformat=v4l2_fourcc('M', 'P', 'G', '4') /* V4L2_PIX_FMT_MPEG4 */}) = 0 <0.000916>
+ioctl(4, VIDIOC_ENUM_FRAMESIZES, {index=0, pixel_format=v4l2_fourcc('M', 'P', 'G', '4') /* V4L2_PIX_FMT_MPEG4 */, type=V4L2_FRMSIZE_TYPE_STEPWISE, stepwise={min_width=32, max_width=1920, step_width=0, min_height=32, max_height=1088, step_height=0}}) = 0 <0.000160>
+ioctl(4, VIDIOC_ENUM_FMT, {index=1, type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE, flags=V4L2_FMT_FLAG_COMPRESSED, description="MPEG-2 ES", pixelformat=v4l2_fourcc('M', 'P', 'G', '2') /* V4L2_PIX_FMT_MPEG2 */}) = 0 <0.000133>
+ioctl(4, VIDIOC_ENUM_FRAMESIZES, {index=0, pixel_format=v4l2_fourcc('M', 'P', 'G', '2') /* V4L2_PIX_FMT_MPEG2 */, type=V4L2_FRMSIZE_TYPE_STEPWISE, stepwise={min_width=32, max_width=1920, step_width=0, min_height=32, max_height=1088, step_height=0}}) = 0 <0.000130>
+ioctl(4, VIDIOC_ENUM_FMT, {index=2, type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE, flags=V4L2_FMT_FLAG_COMPRESSED, description="H.263", pixelformat=v4l2_fourcc('H', '2', '6', '3') /* V4L2_PIX_FMT_H263 */}) = 0 <0.000129>
+ioctl(4, VIDIOC_ENUM_FRAMESIZES, {index=0, pixel_format=v4l2_fourcc('H', '2', '6', '3') /* V4L2_PIX_FMT_H263 */, type=V4L2_FRMSIZE_TYPE_STEPWISE, stepwise={min_width=32, max_width=1920, step_width=0, min_height=32, max_height=1088, step_height=0}}) = 0 <0.000130>
+ioctl(4, VIDIOC_ENUM_FMT, {index=3, type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE, flags=V4L2_FMT_FLAG_COMPRESSED, description="VC-1 (SMPTE 412M Annex G)", pixelformat=v4l2_fourcc('V', 'C', '1', 'G') /* V4L2_PIX_FMT_VC1_ANNEX_G */}) = 0 <0.000129>
+ioctl(4, VIDIOC_ENUM_FRAMESIZES, {index=0, pixel_format=v4l2_fourcc('V', 'C', '1', 'G') /* V4L2_PIX_FMT_VC1_ANNEX_G */, type=V4L2_FRMSIZE_TYPE_STEPWISE, stepwise={min_width=32, max_width=1920, step_width=0, min_height=32, max_height=1088, step_height=0}}) = 0 <0.000129>
+ioctl(4, VIDIOC_ENUM_FMT, {index=4, type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE, flags=V4L2_FMT_FLAG_COMPRESSED, description="VC-1 (SMPTE 412M Annex L)", pixelformat=v4l2_fourcc('V', 'C', '1', 'L') /* V4L2_PIX_FMT_VC1_ANNEX_L */}) = 0 <0.000130>
+ioctl(4, VIDIOC_ENUM_FRAMESIZES, {index=0, pixel_format=v4l2_fourcc('V', 'C', '1', 'L') /* V4L2_PIX_FMT_VC1_ANNEX_L */, type=V4L2_FRMSIZE_TYPE_STEPWISE, stepwise={min_width=32, max_width=1920, step_width=0, min_height=32, max_height=1088, step_height=0}}) = 0 <0.000130>
+ioctl(4, VIDIOC_ENUM_FMT, {index=5, type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE, flags=V4L2_FMT_FLAG_COMPRESSED, description="H.264", pixelformat=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */}) = 0 <0.000130>
+ioctl(4, VIDIOC_ENUM_FRAMESIZES, {index=0, pixel_format=v4l2_fourcc('H', '2', '6', '4') /* V4L2_PIX_FMT_H264 */, type=V4L2_FRMSIZE_TYPE_STEPWISE, stepwise={min_width=32, max_width=1920, step_width=0, min_height=32, max_height=1088, step_height=0}}) = 0 <0.000460>
+ioctl(4, VIDIOC_ENUM_FMT, {index=6, type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE, flags=V4L2_FMT_FLAG_COMPRESSED, description="H.264 MVC", pixelformat=v4l2_fourcc('M', '2', '6', '4') /* V4L2_PIX_FMT_H264_MVC */}) = 0 <0.000158>
+ioctl(4, VIDIOC_ENUM_FRAMESIZES, {index=0, pixel_format=v4l2_fourcc('M', '2', '6', '4') /* V4L2_PIX_FMT_H264_MVC */, type=V4L2_FRMSIZE_TYPE_STEPWISE, stepwise={min_width=32, max_width=1920, step_width=0, min_height=32, max_height=1088, step_height=0}}) = 0 <0.000101>
+ioctl(4, VIDIOC_ENUM_FMT, {index=7, type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE, flags=V4L2_FMT_FLAG_COMPRESSED, description="HEVC", pixelformat=v4l2_fourcc('H', 'E', 'V', 'C') /* V4L2_PIX_FMT_HEVC */}) = 0 <0.000128>
+ioctl(4, VIDIOC_ENUM_FRAMESIZES, {index=0, pixel_format=v4l2_fourcc('H', 'E', 'V', 'C') /* V4L2_PIX_FMT_HEVC */, type=V4L2_FRMSIZE_TYPE_STEPWISE, stepwise={min_width=32, max_width=1920, step_width=0, min_height=32, max_height=1088, step_height=0}}) = 0 <0.000153>
+ioctl(4, VIDIOC_ENUM_FMT, {index=8, type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE, flags=V4L2_FMT_FLAG_COMPRESSED, description="HEVC Hybrid", pixelformat=v4l2_fourcc('H', 'V', 'C', 'H')}) = 0 <0.000132>
+ioctl(4, VIDIOC_ENUM_FRAMESIZES, {index=0, pixel_format=v4l2_fourcc('H', 'V', 'C', 'H'), type=V4L2_FRMSIZE_TYPE_STEPWISE, stepwise={min_width=32, max_width=1920, step_width=0, min_height=32, max_height=1088, step_height=0}}) = 0 <0.000128>
+ioctl(4, VIDIOC_ENUM_FMT, {index=9, type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE, flags=V4L2_FMT_FLAG_COMPRESSED, description="VP8", pixelformat=v4l2_fourcc('V', 'P', '8', '0') /* V4L2_PIX_FMT_VP8 */}) = 0 <0.000092>
+ioctl(4, VIDIOC_ENUM_FRAMESIZES, {index=0, pixel_format=v4l2_fourcc('V', 'P', '8', '0') /* V4L2_PIX_FMT_VP8 */, type=V4L2_FRMSIZE_TYPE_STEPWISE, stepwise={min_width=32, max_width=1920, step_width=0, min_height=32, max_height=1088, step_height=0}}) = 0 <0.000088>
+ioctl(4, VIDIOC_ENUM_FMT, {index=10, type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE, flags=V4L2_FMT_FLAG_COMPRESSED, description="VP9", pixelformat=v4l2_fourcc('V', 'P', '9', '0') /* V4L2_PIX_FMT_VP9 */}) = 0 <0.000111>
+ioctl(4, VIDIOC_ENUM_FRAMESIZES, {index=0, pixel_format=v4l2_fourcc('V', 'P', '9', '0') /* V4L2_PIX_FMT_VP9 */, type=V4L2_FRMSIZE_TYPE_STEPWISE, stepwise={min_width=32, max_width=1920, step_width=0, min_height=32, max_height=1088, step_height=0}}) = 0 <0.000087>
+ioctl(4, VIDIOC_ENUM_FMT, {index=11, type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE, flags=V4L2_FMT_FLAG_COMPRESSED, description="DIVX311", pixelformat=v4l2_fourcc('D', 'I', 'V', '3')}) = 0 <0.000090>
+ioctl(4, VIDIOC_ENUM_FRAMESIZES, {index=0, pixel_format=v4l2_fourcc('D', 'I', 'V', '3'), type=V4L2_FRMSIZE_TYPE_STEPWISE, stepwise={min_width=32, max_width=1920, step_width=0, min_height=32, max_height=1088, step_height=0}}) = 0 <0.000089>
+ioctl(4, VIDIOC_ENUM_FMT, {index=12, type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE, flags=V4L2_FMT_FLAG_COMPRESSED, description="DIVX", pixelformat=v4l2_fourcc('D', 'I', 'V', 'X')}) = 0 <0.000069>
+ioctl(4, VIDIOC_ENUM_FRAMESIZES, {index=0, pixel_format=v4l2_fourcc('D', 'I', 'V', 'X'), type=V4L2_FRMSIZE_TYPE_STEPWISE, stepwise={min_width=32, max_width=1920, step_width=0, min_height=32, max_height=1088, step_height=0}}) = 0 <0.000105>
+ioctl(4, VIDIOC_ENUM_FMT, {index=13, type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE}) = -1 EINVAL (Invalid argument) <0.000097>
+ioctl(4, VIDIOC_ENUM_FMT, {index=0, type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, flags=0, description="Y/CbCr 4:2:0", pixelformat=v4l2_fourcc('N', 'V', '1', '2') /* V4L2_PIX_FMT_NV12 */}) = 0 <0.000067>
+ioctl(4, VIDIOC_ENUM_FRAMESIZES, {index=0, pixel_format=v4l2_fourcc('N', 'V', '1', '2') /* V4L2_PIX_FMT_NV12 */, type=V4L2_FRMSIZE_TYPE_STEPWISE, stepwise={min_width=32, max_width=1920, step_width=0, min_height=32, max_height=1088, step_height=0}}) = 0 <0.000072>
+ioctl(4, VIDIOC_ENUM_FMT, {index=1, type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, flags=0, description="NV12 UBWC", pixelformat=v4l2_fourcc('Q', '1', '2', '8')}) = 0 <0.000069>
+ioctl(4, VIDIOC_ENUM_FRAMESIZES, {index=0, pixel_format=v4l2_fourcc('Q', '1', '2', '8'), type=V4L2_FRMSIZE_TYPE_STEPWISE, stepwise={min_width=32, max_width=1920, step_width=0, min_height=32, max_height=1088, step_height=0}}) = 0 <0.000065>
+ioctl(4, VIDIOC_ENUM_FMT, {index=2, type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, flags=0, description="Y/CbCr 4:2:0 TP10 UBWC", pixelformat=v4l2_fourcc('Q', '1', '2', 'A')}) = 0 <0.000068>
+ioctl(4, VIDIOC_ENUM_FRAMESIZES, {index=0, pixel_format=v4l2_fourcc('Q', '1', '2', 'A'), type=V4L2_FRMSIZE_TYPE_STEPWISE, stepwise={min_width=32, max_width=1920, step_width=0, min_height=32, max_height=1088, step_height=0}}) = 0 <0.000066>
+ioctl(4, VIDIOC_ENUM_FMT, {index=3, type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE}) = -1 EINVAL (Invalid argument) <0.000095>
+ioctl(4, VIDIOC_SUBSCRIBE_EVENT, 0x7fcdb08aa8) = 0 <0.000073>
+ioctl(4, VIDIOC_SUBSCRIBE_EVENT, 0x7fcdb08aa8) = 0 <0.000069>
+ioctl(4, VIDIOC_SUBSCRIBE_EVENT, 0x7fcdb08aa8) = 0 <0.000068>
+ioctl(4, VIDIOC_SUBSCRIBE_EVENT, 0x7fcdb08aa8) = 0 <0.000070>
+ioctl(4, VIDIOC_SUBSCRIBE_EVENT, 0x7fcdb08aa8) = 0 <0.000069>
+ioctl(4, VIDIOC_SUBSCRIBE_EVENT, 0x7fcdb08aa8) = 0 <0.000069>
+ioctl(4, VIDIOC_SUBSCRIBE_EVENT, 0x7fcdb08aa8) = 0 <0.000069>
+ioctl(4, VIDIOC_SUBSCRIBE_EVENT, 0x7fcdb08aa8) = 0 <0.000070>
+ioctl(4, VIDIOC_S_PARM, {type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE}) = 0 <0.000752>
+ioctl(4, VIDIOC_S_FMT, {type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE, fmt.pix_mp={width=1928, height=1208, pixelformat=v4l2_fourcc('H', 'E', 'V', 'C') /* V4L2_PIX_FMT_HEVC */, field=V4L2_FIELD_ANY, colorspace=V4L2_COLORSPACE_DEFAULT, plane_fmt=[], num_planes=0}} => {fmt.pix_mp={width=1928, height=1208, pixelformat=v4l2_fourcc('H', 'E', 'V', 'C') /* V4L2_PIX_FMT_HEVC */, field=V4L2_FIELD_ANY, colorspace=V4L2_COLORSPACE_DEFAULT, plane_fmt=[{sizeimage=7077888, bytesperline=0}], num_planes=1}}) = 0 <0.003962>
+ioctl(4, VIDIOC_REQBUFS, {type=V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE, memory=V4L2_MEMORY_USERPTR, count=6 => 6}) = 0 <0.002502>
+ioctl(5, _IOC(_IOC_READ|_IOC_WRITE, 0x49, 0, 0x20), 0x7fcdb08978) = 0 <0.001415>
+ioctl(5, _IOC(_IOC_READ|_IOC_WRITE, 0x49, 0x2, 0x8), 0x7fcdb08970) = 0 <0.000542>
+ioctl(5, _IOC(_IOC_READ|_IOC_WRITE, 0x49, 0x1, 0x4), 0x7fcdb08968) = 0 <0.000096>
+error: failed to connect to wayland display: No such file or directory
+error: display server not available, continuing anyway...
+ioctl(4, VIDIOC_S_CTRL, {id=V4L2_CTRL_CLASS_CODEC+0x2045, value=0 => 0}) = 0 <0.000632>
+ioctl(4, VIDIOC_S_CTRL, {id=V4L2_CTRL_CLASS_CODEC+0x2081, value=2 => 2}) = 0 <0.000747>
+ioctl(4, VIDIOC_S_CTRL, {id=V4L2_CTRL_CLASS_CODEC+0x2019, value=255 => 255}) = 0 <0.000198>
+ioctl(4, VIDIOC_S_CTRL, {id=V4L2_CTRL_CLASS_CODEC+0x2011, value=2 => 2}) = 0 <0.000234>
+ioctl(4, VIDIOC_S_CTRL, {id=V4L2_CTRL_CLASS_CODEC+0x2011, value=25 => 25}) = 0 <0.000200>
+ioctl(4, VIDIOC_S_CTRL, {id=V4L2_CTRL_CLASS_CODEC+0x2011, value=15 => 15}) = 0 <0.000218>
+ioctl(4, VIDIOC_S_CTRL, {id=V4L2_CTRL_CLASS_CODEC+0x2011, value=7 => 7}) = 0 <0.000218>
+ioctl(4, VIDIOC_STREAMON, [V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE]) = 0 <0.000204>
+ioctl(4, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_CODEC, count=2, controls=[{id=0x992016 /* V4L2_CID_??? */, size=0, value=0, value64=0}, {id=0x99202c /* V4L2_CID_??? */, size=0, value=0, value64=0}]} => {controls=[{id=0x992016 /* V4L2_CID_??? */, size=0, value=0, value64=0}, {id=0x99202c /* V4L2_CID_??? */, size=0, value=0, value64=0}]}) = 0 <0.000328>
+ioctl(4, VIDIOC_S_FMT, {type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, fmt.pix_mp={width=1928, height=1208, pixelformat=v4l2_fourcc('Q', '1', '2', '8'), field=V4L2_FIELD_ANY, colorspace=V4L2_COLORSPACE_DEFAULT, plane_fmt=[], num_planes=0}} => {fmt.pix_mp={width=1928, height=1208, pixelformat=v4l2_fourcc('Q', '1', '2', '8'), field=V4L2_FIELD_ANY, colorspace=V4L2_COLORSPACE_DEFAULT, plane_fmt=[{sizeimage=4972544, bytesperline=0}, {sizeimage=16384, bytesperline=0}], num_planes=2}}) = 0 <0.000188>
+ioctl(4, VIDIOC_REQBUFS, {type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, memory=V4L2_MEMORY_USERPTR, count=4 => 6}) = 0 <0.005834>
+ioctl(4, VIDIOC_G_FMT, {type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE, fmt.pix_mp={width=1928, height=1208, pixelformat=v4l2_fourcc('Q', '1', '2', '8'), field=V4L2_FIELD_ANY, colorspace=V4L2_COLORSPACE_DEFAULT, plane_fmt=[{sizeimage=4972544, bytesperline=2048}, {sizeimage=16384, bytesperline=0}], num_planes=2}}) = 0 <0.000074>
+ioctl(5, _IOC(_IOC_READ|_IOC_WRITE, 0x49, 0, 0x20), 0x7fcdb088e8) = 0 <0.001889>
+ioctl(5, _IOC(_IOC_READ|_IOC_WRITE, 0x49, 0x2, 0x8), 0x7fcdb088e0) = 0 <0.000097>
+ioctl(5, _IOC(_IOC_READ|_IOC_WRITE, 0x49, 0x1, 0x4), 0x7fcdb088d8) = 0 <0.000071>
+ioctl(5, _IOC(_IOC_READ|_IOC_WRITE, 0x49, 0, 0x20), 0x7fcdb088e8) = 0 <0.002211>
+ioctl(5, _IOC(_IOC_READ|_IOC_WRITE, 0x49, 0x2, 0x8), 0x7fcdb088e0) = 0 <0.000108>
+ioctl(5, _IOC(_IOC_READ|_IOC_WRITE, 0x49, 0x1, 0x4), 0x7fcdb088d8) = 0 <0.000074>
+ioctl(5, _IOC(_IOC_READ|_IOC_WRITE, 0x49, 0, 0x20), 0x7fcdb088e8) = 0 <0.003419>
+ioctl(5, _IOC(_IOC_READ|_IOC_WRITE, 0x49, 0x2, 0x8), 0x7fcdb088e0) = 0 <0.000120>
+ioctl(5, _IOC(_IOC_READ|_IOC_WRITE, 0x49, 0x1, 0x4), 0x7fcdb088d8) = 0 <0.000073>
+ioctl(5, _IOC(_IOC_READ|_IOC_WRITE, 0x49, 0, 0x20), 0x7fcdb088e8) = 0 <0.003215>
+ioctl(5, _IOC(_IOC_READ|_IOC_WRITE, 0x49, 0x2, 0x8), 0x7fcdb088e0) = 0 <0.000090>
+ioctl(5, _IOC(_IOC_READ|_IOC_WRITE, 0x49, 0x1, 0x4), 0x7fcdb088d8) = 0 <0.000070>
+ioctl(5, _IOC(_IOC_READ|_IOC_WRITE, 0x49, 0, 0x20), 0x7fcdb088e8) = 0 <0.002932>
+ioctl(5, _IOC(_IOC_READ|_IOC_WRITE, 0x49, 0x2, 0x8), 0x7fcdb088e0) = 0 <0.000086>
+ioctl(5, _IOC(_IOC_READ|_IOC_WRITE, 0x49, 0x1, 0x4), 0x7fcdb088d8) = 0 <0.000070>
+ioctl(5, _IOC(_IOC_READ|_IOC_WRITE, 0x49, 0, 0x20), 0x7fcdb088e8) = 0 <0.003174>
+ioctl(5, _IOC(_IOC_READ|_IOC_WRITE, 0x49, 0x2, 0x8), 0x7fcdb088e0) = 0 <0.000086>
+ioctl(5, _IOC(_IOC_READ|_IOC_WRITE, 0x49, 0x1, 0x4), 0x7fcdb088d8) = 0 <0.000069>
+ioctl(5, _IOC(_IOC_READ|_IOC_WRITE, 0x49, 0, 0x20), 0x7fcdb088b8) = 0 <0.000268>
+ioctl(5, _IOC(_IOC_READ|_IOC_WRITE, 0x49, 0x2, 0x8), 0x7fcdb088b0) = 0 <0.000079>
+ioctl(5, _IOC(_IOC_READ|_IOC_WRITE, 0x49, 0x1, 0x4), 0x7fcdb088a8) = 0 <0.000068>
+ioctl(4, VIDIOC_STREAMON, [V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE]) = -1 EINVAL (Invalid argument) <0.009310>
+error: failed to stream on CAPTURE queue (status=1074026002)
++++ exited with 1 +++

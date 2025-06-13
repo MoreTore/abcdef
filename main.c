@@ -1337,12 +1337,15 @@ fail:
 	stream_close(i);
 	return -1;
 }
-
+#include "rotator/rot_test.h"
 int main(int argc, char **argv)
 {
 	struct instance inst;
 	pthread_t parser_thread;
 	int ret;
+
+	test_rot(argc, argv);
+	//exit(0);
 
 
 	ret = parse_args(&inst, argc, argv);
