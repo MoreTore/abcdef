@@ -882,11 +882,12 @@ handle_video_capture(struct instance *i)
 
 			// Convert UBWC to linear NV12 using SDE rotator  
 			unsigned char *linear_data = NULL;  
-			size_t linear_size = 0;  
-			
-			int ret = convert_ubwc_to_linear(data, bytesused,
-										i->width, i->height,    
-										&linear_data, &linear_size); 
+			size_t linear_size = 0;
+			unsigned long ion_fd = (unsigned long)vid->cap_buf_fd[n];
+
+			int ret = convert_ubwc_to_linear(ion_fd, data, bytesused,
+			 							i->width, i->height,
+			 							&linear_data, &linear_size);
 		}
 
 		pthread_mutex_unlock(&i->lock);
@@ -1344,7 +1345,7 @@ int main(int argc, char **argv)
 	pthread_t parser_thread;
 	int ret;
 
-	test_rot(argc, argv);
+	//test_rot(argc, argv);
 	//exit(0);
 
 

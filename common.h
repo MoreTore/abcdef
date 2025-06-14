@@ -46,7 +46,7 @@ extern int debug_level;
 	} while (0)
 
 #define err(msg, ...) \
-	print(1, "error: " msg "\n", ##__VA_ARGS__)
+    print(1, "\033[31merror: " msg "\033[0m\n", ##__VA_ARGS__)
 
 #define info(msg, ...) \
 	print(2, msg "\n", ##__VA_ARGS__)
