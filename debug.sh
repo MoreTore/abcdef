@@ -5,3 +5,4 @@ echo 0xff > /sys/devices/platform/soc/aa00000.qcom,vidc/video4linux/video33/dev_
 echo 6 > /sys/module/drm/parameters/debug
 cat /sys/kernel/debug/msm_vidc/core0/*
 strace -Tfe trace=ioctl ./v4l2_decode fcamera.hevc -v
+ffmpeg -f rawvideo -pixel_format nv12 -video_size 1952x1216 -i frame_nv12.yuv -frames:v 1 frame.png

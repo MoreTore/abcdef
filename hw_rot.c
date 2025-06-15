@@ -131,7 +131,7 @@ int convert_ubwc_to_linear(unsigned long out_buf_fd, unsigned char *ubwc_data, s
     };
     ioctl(rotator_fd, VIDIOC_DQBUF, &dqout);
 
-    void *linear_ptr = mmap(NULL, dq.bytesused,
+    void *linear_ptr = mmap(NULL, dq.length,
                         PROT_READ|PROT_WRITE,
                         MAP_SHARED,
                         cap_ion_fd, 0);
@@ -140,15 +140,28 @@ int convert_ubwc_to_linear(unsigned long out_buf_fd, unsigned char *ubwc_data, s
         err("mmap CAP");
         return -1;
     }
-    // linear_ptr[0..dq.bytesused-1] is your NV12 frame
+    // linear_ptr[0..dq.length-1] is your NV12 frame
     *linear_data = (unsigned char *)linear_ptr;  // set the output pointer
-    
-    // clean up
+    *linear_size = dq.length;  // set the output size
+    // Save the NV12 frame to a file for veiwing
+    FILE *f = fopen("frame_nv12.yuv", "wb");
+    if (!f) {
+        err("Failed to open output file");
+        return -1;
+    }
+
+    size_t written = fwrite(*linear_data, 1, *linear_size, f);
+    if (written != *linear_size) {
+        err("Partial write occurred");
+        fclose(f);
+        return -1;
+    }
+
+    fclose(f);
+
+
 
     return 0;
-
-
-    // Check if the rotator supports NV12_UBWC input format
     
    
 }
