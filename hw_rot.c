@@ -14,56 +14,62 @@
 
 #define DBG_TAG "rot_test"
   
-int convert_ubwc_to_linear(unsigned long out_buf_fd, unsigned char *ubwc_data, size_t ubwc_size,  
+int convert_ubwc_to_linear(unsigned long out_buf_fd, 
                           int width, int height,  
                           unsigned char **linear_data, size_t *linear_size)  
 {  
-    int rotator_fd = -1;  
+    static int rotator_fd = -1;  
+    static int cap_ion_fd = -1;
     int ret = -1;  
-    struct v4l2_format fmt_cap = {0}, fmt_out = {0};  
+    static struct v4l2_format fmt_cap = {0}, fmt_out = {0};  
     struct v4l2_requestbuffers req_in = {0}, req_out = {0};  
     struct v4l2_buffer buf_in = {0}, buf_out = {0};  
     void *mapped_in = NULL, *mapped_out = NULL;  
       
     // Open SDE rotator device  
-    rotator_fd = open("/dev/video2", O_RDWR);
+    rotator_fd = open("/dev/video2", O_RDWR);  
     if (rotator_fd < 0) {  
         err("Failed to open rotator device");  
         return -1;  
     }
-
     // VIDIOC_QUERYCAP to check capabilities
     struct v4l2_capability cap;
     memzero(cap);
     if (ioctl(rotator_fd, VIDIOC_QUERYCAP, &cap) < 0) {
-		err("Failed to verify capabilities: %m");
-		return -1;
-	}
-	dbg("caps (/dev/video2): driver=\"%s\" bus_info=\"%s\" card=\"%s\" "
-	    "version=%u.%u.%u",  cap.driver, cap.bus_info, cap.card,
-	    (cap.version >> 16) & 0xff,
-	    (cap.version >> 8) & 0xff,
-	    cap.version & 0xff);
-
+        err("Failed to verify capabilities: %m");
+        return -1;
+    }
+    dbg("caps (/dev/video2): driver=\"%s\" bus_info=\"%s\" card=\"%s\" "
+        "version=%u.%u.%u",  cap.driver, cap.bus_info, cap.card,
+        (cap.version >> 16) & 0xff,
+        (cap.version >> 8) & 0xff,
+        cap.version & 0xff);
+    
     fmt_out.type = V4L2_BUF_TYPE_VIDEO_OUTPUT;
     fmt_out.fmt.pix.width       = 1952;      // e.g. 1952
     fmt_out.fmt.pix.height      = 1216;      // e.g. 1216
     fmt_out.fmt.pix.pixelformat = V4L2_PIX_FMT_NV12_UBWC;  // the UBWC fourcc
     fmt_out.fmt.pix.field       = V4L2_FIELD_NONE;
     ioctl(rotator_fd, VIDIOC_S_FMT, &fmt_out);
-
     fmt_cap.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     fmt_cap.fmt.pix.width       = 1952;
     fmt_cap.fmt.pix.height      = 1216;
     fmt_cap.fmt.pix.pixelformat = V4L2_PIX_FMT_NV12;      // plain NV12
     fmt_cap.fmt.pix.field       = V4L2_FIELD_NONE;
     ioctl(rotator_fd, VIDIOC_S_FMT, &fmt_cap);
-
+    
     struct v4l2_requestbuffers req = {0};
     req.count  = 1;
     req.type   = V4L2_BUF_TYPE_VIDEO_OUTPUT;
     req.memory = V4L2_MEMORY_USERPTR;
     ioctl(rotator_fd, VIDIOC_REQBUFS, &req);
+    // allocate capture ion buffer
+    cap_ion_fd = alloc_ion_buffer(fmt_cap.fmt.pix.sizeimage, 0);
+    if (cap_ion_fd < 0) {
+        err("Failed to allocate ION buffer for capture");
+        return -1;
+    }
+
 
     struct v4l2_buffer buf = {0};
     info("ion buffer fd: %i", out_buf_fd);
@@ -75,14 +81,6 @@ int convert_ubwc_to_linear(unsigned long out_buf_fd, unsigned char *ubwc_data, s
     buf.length    = sizeimage;               // use fmt_out.fmt.pix.sizeimage
     ioctl(rotator_fd, VIDIOC_QBUF, &buf);
 
-
-    // allocate capture ion buffer
-    size_t cap_size = fmt_cap.fmt.pix.sizeimage;
-    int cap_ion_fd = alloc_ion_buffer(cap_size, 0);
-    if (cap_ion_fd < 0) {
-        err("Failed to allocate ION buffer for capture");
-        return -1;
-    }
 
     struct v4l2_requestbuffers req_cap = {0};
     req_cap.count  = 1;
@@ -97,7 +95,6 @@ int convert_ubwc_to_linear(unsigned long out_buf_fd, unsigned char *ubwc_data, s
     cap_buf.m.userptr = (unsigned long)cap_ion_fd;  // use the ION fd
     ioctl(rotator_fd, VIDIOC_QUERYBUF, &cap_buf);
     cap_buf.m.userptr = (unsigned long)cap_ion_fd;  // use the ION fd 
-    assert(cap_buf.length == cap_size);  // ensure size matches
     ioctl(rotator_fd, VIDIOC_QBUF, &cap_buf);
 
     enum v4l2_buf_type t = V4L2_BUF_TYPE_VIDEO_OUTPUT;
@@ -140,28 +137,32 @@ int convert_ubwc_to_linear(unsigned long out_buf_fd, unsigned char *ubwc_data, s
         err("mmap CAP");
         return -1;
     }
-    // linear_ptr[0..dq.length-1] is your NV12 frame
-    *linear_data = (unsigned char *)linear_ptr;  // set the output pointer
-    *linear_size = dq.length;  // set the output size
-    // Save the NV12 frame to a file for veiwing
-    FILE *f = fopen("frame_nv12.yuv", "wb");
-    if (!f) {
-        err("Failed to open output file");
-        return -1;
-    }
+    // // linear_ptr[0..dq.length-1] is NV12 frame
+    // *linear_data = (unsigned char *)linear_ptr;  // set the output pointer
+    // *linear_size = dq.length;                    // set the output size
+    // // Save the NV12 frame to a file for veiwing
+    // FILE *f = fopen("frame_nv12.yuv", "wb");
+    // if (!f) {
+    //     err("Failed to open output file");
+    //     return -1;
+    // }
 
-    size_t written = fwrite(*linear_data, 1, *linear_size, f);
-    if (written != *linear_size) {
-        err("Partial write occurred");
-        fclose(f);
-        return -1;
-    }
+    // size_t written = fwrite(*linear_data, 1, *linear_size, f);
+    // if (written != *linear_size) {
+    //     err("Partial write occurred");
+    //     fclose(f);
+    //     return -1;
+    // }
 
-    fclose(f);
+    // fclose(f);
 
-
-
-    return 0;
+    // Clean up resources assuming everything worked
     
+    
+    munmap(linear_ptr, dq.length);
+    close(cap_ion_fd);
+    close(rotator_fd);
+    info("UBWC to linear conversion successful");
+    return 0;
    
 }

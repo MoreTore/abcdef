@@ -49,10 +49,10 @@ extern int debug_level;
     print(1, "\033[31merror: " msg "\033[0m\n", ##__VA_ARGS__)
 
 #define info(msg, ...) \
-	print(2, msg "\n", ##__VA_ARGS__)
+    print(2, "\033[34minfo: " msg "\033[0m\n", ##__VA_ARGS__)
 
 #define dbg(msg, ...) \
-	print(3, DBG_TAG ": " msg "\n", ##__VA_ARGS__)
+    print(3, "\033[35m" DBG_TAG ": " msg "\033[0m\n", ##__VA_ARGS__)
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
@@ -118,6 +118,18 @@ struct video {
 	unsigned long total_captured;
 };
 
+struct rotator {
+	int fd;
+	int width;
+	int height;
+	int fourcc;
+	int secure;
+	int out_buf_size;
+	int out_buf_cnt;
+	unsigned long out_buf_fd[MAX_OUT_BUF];
+	void *out_buf_addr[MAX_OUT_BUF];
+};
+
 struct instance {
 	int width;
 	int height;
@@ -136,6 +148,7 @@ struct instance {
 
 	/* video decoder related parameters */
 	struct video	video;
+	struct rotator	rotator;
 
 	pthread_mutex_t lock;
 	pthread_cond_t cond;

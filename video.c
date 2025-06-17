@@ -940,8 +940,7 @@ int video_flush(struct instance *i, uint32_t flags)
 	return 0;
 }
 
-int
-alloc_ion_buffer(size_t size, uint32_t flags)
+int alloc_ion_buffer(size_t size, uint32_t flags)
 {
 	struct ion_allocation_data ion_alloc = { 0 };
 	struct ion_fd_data ion_fd_data = { 0 };
@@ -996,7 +995,7 @@ alloc_ion_buffer(size_t size, uint32_t flags)
 	return ret;
 }
 
-static int setup_extradata(struct instance *i, int index, int size)
+int setup_extradata(struct instance *i, int index, int size)
 {
 	struct video *vid = &i->video;
 	int off = 0;
@@ -1121,10 +1120,8 @@ int video_setup_capture(struct instance *i, int num_buffers, int w, int h)
 		break;
 	}
 
-	if (i->secure)
-		ion_flags = ION_FLAG_SECURE | ION_FLAG_CP_PIXEL;
-	else
-		ion_flags = 0;
+
+	ion_flags = 0;
 
 	for (n = 0; n < vid->cap_buf_cnt; n++) {
 		ion_fd = alloc_ion_buffer(vid->cap_buf_size, ion_flags);

@@ -104,17 +104,17 @@ restart_capture(struct instance *i)
 	 * wayland compositor; buffers in use will be destroyed
 	 * when the release callback is called
 	 */
-	list_for_each_entry_safe(fb, next, &i->fb_list, link) {
-		if (!fb->busy)
-			fb_destroy(fb);
-	}
+	// list_for_each_entry_safe(fb, next, &i->fb_list, link) {
+	// 	if (!fb->busy)
+	// 		fb_destroy(fb);
+	// }
 
 	/* Stop capture and release buffers */
 	if (vid->cap_buf_cnt > 0 && video_stop_capture(i))
 		return -1;
 
 	/* Setup capture queue with new parameters */
-	if (video_setup_capture(i, 14, i->width, i->height))
+	if (video_setup_capture(i, 4, i->width, i->height))
 		return -1;
 
 	/* Start streaming */
@@ -131,7 +131,7 @@ restart_capture(struct instance *i)
 	/*
 	 * Recreate the window frame buffers
 	 */
-	i->group++;
+	// i->group++;
 
 	return 0;
 }
@@ -350,8 +350,7 @@ ts_remove(struct ts_entry *l)
 	free(l);
 }
 
-static int
-parse_frame(struct instance *i, AVPacket *pkt)
+static int parse_frame(struct instance *i, AVPacket *pkt)
 {
 	int ret;
 
@@ -513,8 +512,7 @@ vc1_find_sc(const uint8_t *data, int size)
 	return -1;
 }
 
-static int
-write_sequence_header_vc1(struct instance *i, uint8_t *data, int size)
+static int write_sequence_header_vc1(struct instance *i, uint8_t *data, int size)
 {
 	AVCodecParameters *codecpar = i->stream->codecpar;
 	int n;
@@ -977,6 +975,20 @@ enum {
 	EV_COUNT
 };
 
+/**
+ * @brief Initializes the keyboard input for non-canonical, non-echo mode.
+ *
+ * This function modifies the terminal settings for standard input (stdin)
+ * to disable canonical mode (input is available immediately) and echoing
+ * (input is not displayed on the terminal). It saves the original terminal
+ * settings in the provided instance structure for later restoration.
+ *
+ * @param i Pointer to an instance structure where the original terminal
+ *          settings will be stored and a flag will be set if initialization
+ *          is successful.
+ * @return STDIN_FILENO (file descriptor for standard input) on success,
+ *         or -1 on failure.
+ */
 static int
 kbd_init(struct instance *i)
 {
@@ -1338,16 +1350,12 @@ fail:
 	stream_close(i);
 	return -1;
 }
-#include "rotator/rot_test.h"
+
 int main(int argc, char **argv)
 {
 	struct instance inst;
 	pthread_t parser_thread;
 	int ret;
-
-	//test_rot(argc, argv);
-	//exit(0);
-
 
 	ret = parse_args(&inst, argc, argv);
 	if (ret) {
@@ -1379,20 +1387,10 @@ int main(int argc, char **argv)
 	if (ret)
 		goto err;
 
-	if (inst.secure) {
-		ret = video_set_secure(&inst);
-		if (ret)
-			goto err;
-	}
-
 	ret = video_setup_output(&inst, inst.fourcc,
 				 STREAM_BUUFER_SIZE, 4);
 	if (ret)
 		goto err;
-
-	ret = setup_display(&inst);
-	if (ret)
-		err("display server not available, continuing anyway...");
 
 	ret = video_set_control(&inst);
 	if (ret)
@@ -1402,13 +1400,13 @@ int main(int argc, char **argv)
 			   VIDIOC_STREAMON);
 	if (ret)
 		goto err;
+	
 
 	ret = restart_capture(&inst);
 	if (ret)
 		goto err;
 
 	dbg("Launching threads");
-
 	setup_signal(&inst);
 
 	if (pthread_create(&parser_thread, NULL, parser_thread_func, &inst))
